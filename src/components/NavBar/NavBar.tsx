@@ -21,7 +21,7 @@ function NavBar() {
     <Navbar expand="lg" className="shadow-sm">
       <Container fluid>
         <NavbarBrand as={Link} to="/entry">
-          Firm Archive
+          Logger
         </NavbarBrand>
         <NavbarToggle aria-controls="basic-navbar-nav" />
         <NavbarCollapse>

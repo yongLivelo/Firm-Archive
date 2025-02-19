@@ -12,8 +12,30 @@ import {
 import { auth, db } from "@/firebase/firebase";
 import { AuthContext } from "@/App";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 function Login() {
+  const handleGoogle = async (e: any) => {
+    const provider = await new GoogleAuthProvider();
+    const userCredential = await signInWithPopup(auth, provider);
+    try {
+      const userDocRef = doc(db, "users", userCredential.user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      if (!userDocSnap.exists()) {
+        await setDoc(userDocRef, {
+          email: userCredential.user.email,
+          draft: "[]",
+          post: "[]",
+          transactionCounter: "{}",
+        });
+      } else {
+        setLoading(false);
+      }
+    } catch (err: any) {
+      console.log("error occured");
+    }
+  };
+
   const user = useContext(AuthContext); // Get user context
   const [loading, setLoading] = useState(false);
 
@@ -82,17 +104,25 @@ function Login() {
             required
           />
         </FormGroup>
-        <Button type="submit" variant="primary" disabled={loading}>
-          {loading ? (
-            <Spinner
-              animation="border"
-              style={{ width: "20px", height: "20px" }}
-              role="status"
-            />
-          ) : (
-            "Login"
-          )}
-        </Button>
+        <div className="d-flex flex-column gap-2">
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={loading}
+            className="w-50"
+          >
+            {loading ? (
+              <Spinner
+                animation="border"
+                style={{ width: "20px", height: "20px" }}
+                role="status"
+              />
+            ) : (
+              "Login"
+            )}
+          </Button>
+          <Button onClick={handleGoogle}>Login With Google</Button>
+        </div>
       </Form>
     </div>
   );
